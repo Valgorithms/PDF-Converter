@@ -11,7 +11,7 @@ It is a port of a short Python script that did the same with Pillow and ReportLa
 
 Open the site, choose or drop an image, and download the PDF. The page is plain HTML and a JavaScript module in [`web/`](web), with no build step and nothing loaded from other sites.
 
-The [Publish site](.github/workflows/pages.yml) workflow copies `web/` to the `gh-pages` branch whenever it changes on `main`. To serve it, set **Settings → Pages → Source** to *Deploy from a branch*, with `gh-pages` and `/ (root)`.
+The [Publish site](.github/workflows/pages.yml) workflow publishes the site to the `gh-pages` branch whenever `web/` or `src/` changes on `main`, and on each release. The converter is the site's root page; the PHP class reference, built with phpDocumentor, is under `/reference/`. To serve it, set **Settings → Pages → Source** to *Deploy from a branch*, with `gh-pages` and `/ (root)`.
 
 To try it locally, serve the folder, since browsers only load modules over HTTP:
 
@@ -70,4 +70,18 @@ The browser version's tests use Node's built-in test runner and need Node 22 or 
 
 ```bash
 composer test-web
+```
+
+## Coding standards and documentation
+
+The PHP code is formatted with php-cs-fixer, using [`.php-cs-fixer.dist.php`](.php-cs-fixer.dist.php); the Coding Standards workflow fails a push that isn't formatted.
+
+```bash
+composer cs
+```
+
+The class reference is built with [phpDocumentor](https://phpdoc.org) from [`phpdoc.dist.xml`](phpdoc.dist.xml) into `build/reference/`. To build it locally, install phpDocumentor (for example with `phive install phpDocumentor`) and run it from the repository root:
+
+```bash
+tools/phpDocumentor --config phpdoc.dist.xml
 ```

@@ -177,7 +177,7 @@ final class ImageToPdf
     {
         return self::stream(
             "<< /Type /XObject /Subtype /Image /Width {$width} /Height {$height} /ColorSpace /{$colorSpace} /BitsPerComponent 8 /Filter /FlateDecode{$extra}",
-            $samples
+            $samples,
         );
     }
 

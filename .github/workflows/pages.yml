@@ -1,11 +1,17 @@
 name: Publish site
 
+# The site is the browser converter at the root and the PHP class reference under /reference/,
+# built together because publishing to gh-pages replaces the whole branch.
 on:
   push:
     branches: [main]
     paths:
       - 'web/**'
+      - 'src/**'
+      - 'phpdoc.dist.xml'
       - '.github/workflows/pages.yml'
+  release:
+    types: [published]
   workflow_dispatch:
 
 permissions:
@@ -22,11 +28,27 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # The site is plain HTML and a module, so web/ is published as it is.
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: iconv, mbstring
+          tools: phive
+
+      - name: Install phpDocumentor
+        run: phive install phpDocumentor --trust-gpg-keys 67F861C3D889C656,6DA3ACC4991FFAE5
+
+      - name: Build class reference
+        run: ./tools/phpDocumentor --config phpdoc.dist.xml --no-interaction
+
+      # The converter is plain HTML and a module, so web/ is copied as it is.
+      - name: Add the converter
+        run: cp -r web/. build/
+
       - name: Publish to gh-pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: gh-pages
-          folder: web
+          folder: build
           clean: true
