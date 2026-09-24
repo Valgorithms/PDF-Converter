@@ -1,0 +1,32 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+// Converts an image into a one-page PDF the size of the image, and prints the PDF's path.
+// Usage: php bin/image-to-pdf <image> [output.pdf]
+// Without an output path, the PDF is written beside the image with a .pdf extension.
+
+use PdfConverter\ImageToPdf;
+
+require __DIR__.'/../src/ImageToPdf.php';
+
+// GD holds four bytes per pixel, so a phone photo alone can pass PHP's default 128 MB.
+ini_set('memory_limit', '-1');
+
+if ($argc < 2 || $argc > 3) {
+    fwrite(STDERR, "Usage: php bin/image-to-pdf <image> [output.pdf]\n");
+
+    exit(1);
+}
+
+$imagePath = $argv[1];
+$pdfPath = $argv[2] ?? preg_replace('/\.[^.\\\\\/]*$/', '', $imagePath).'.pdf';
+
+try {
+    echo ImageToPdf::convert($imagePath, $pdfPath), PHP_EOL;
+} catch (\RuntimeException|\InvalidArgumentException $e) {
+    fwrite(STDERR, $e->getMessage().PHP_EOL);
+
+    exit(1);
+}

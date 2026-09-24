@@ -1,0 +1,30 @@
+{
+    "name": "vzgcoders/pdf-converter",
+    "description": "Converts an image into a single-page PDF the size of the image, with no dependencies beyond GD and zlib.",
+    "type": "library",
+    "require": {
+        "php": "^8.1",
+        "ext-gd": "*",
+        "ext-zlib": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5 || ^11.0 || ^12.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "PdfConverter\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "PdfConverter\\Tests\\": "tests/"
+        }
+    },
+    "bin": [
+        "bin/image-to-pdf"
+    ],
+    "scripts": {
+        "test": "phpunit",
+        "test-web": "node --test tests/web/image-to-pdf.test.mjs"
+    }
+}
