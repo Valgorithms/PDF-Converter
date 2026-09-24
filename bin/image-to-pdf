@@ -3,9 +3,10 @@
 
 declare(strict_types=1);
 
-// Converts an image into a one-page PDF the size of the image, and prints the PDF's path.
-// Usage: php bin/image-to-pdf <image> [output.pdf]
-// Without an output path, the PDF is written beside the image with a .pdf extension.
+// Converts images into a PDF with a page for each, every page the size of its image, and prints the PDF's path.
+// Usage: php bin/image-to-pdf <image>... [output.pdf]
+// Pages follow the order the images are given in. The argument ending in .pdf, if any, is where the PDF
+// goes; without one, it is written beside the first image with a .pdf extension.
 
 use PdfConverter\ImageToPdf;
 
@@ -14,17 +15,20 @@ require __DIR__.'/../src/ImageToPdf.php';
 // GD holds four bytes per pixel, so a phone photo alone can pass PHP's default 128 MB.
 ini_set('memory_limit', '-1');
 
-if ($argc < 2 || $argc > 3) {
-    fwrite(STDERR, "Usage: php bin/image-to-pdf <image> [output.pdf]\n");
+$arguments = array_slice($argv, 1);
+$outputs = array_values(array_filter($arguments, static fn (string $a) => 1 === preg_match('/\.pdf$/i', $a)));
+$imagePaths = array_values(array_diff($arguments, $outputs));
+
+if ([] === $imagePaths || count($outputs) > 1) {
+    fwrite(STDERR, "Usage: php bin/image-to-pdf <image>... [output.pdf]\n");
 
     exit(1);
 }
 
-$imagePath = $argv[1];
-$pdfPath = $argv[2] ?? preg_replace('/\.[^.\\\\\/]*$/', '', $imagePath).'.pdf';
+$pdfPath = $outputs[0] ?? preg_replace('/\.[^.\\\\\/]*$/', '', $imagePaths[0]).'.pdf';
 
 try {
-    echo ImageToPdf::convert($imagePath, $pdfPath), PHP_EOL;
+    echo ImageToPdf::convertAll($imagePaths, $pdfPath), PHP_EOL;
 } catch (\RuntimeException|\InvalidArgumentException $e) {
     fwrite(STDERR, $e->getMessage().PHP_EOL);
 

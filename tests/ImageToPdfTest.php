@@ -95,6 +95,109 @@ final class ImageToPdfTest extends TestCase
         ImageToPdf::fromString('not an image', 'notes.txt');
     }
 
+    public function testEachImageBecomesAPageInTheOrderGiven(): void
+    {
+        $pdf = ImageToPdf::fromStrings([
+            $this->png(static fn () => null, 3, 2),
+            $this->png(static function (\GdImage $image) {
+                imagealphablending($image, false);
+                imagesetpixel($image, 0, 0, imagecolorallocatealpha($image, 0, 0, 0, 127));
+            }, 5, 4),
+            $this->png(static fn () => null, 2, 7),
+        ]);
+
+        // Page 1 takes objects 3–5, page 2 (with a mask) 6–9, page 3 10–12.
+        $this->assertStringContainsString('<< /Type /Pages /Kids [3 0 R 6 0 R 10 0 R] /Count 3 >>', $this->object($pdf, 2)[0]);
+        $this->assertSame(['3 2', '5 4', '2 7'], array_map(
+            fn (int $page) => preg_match('/\/MediaBox \[0 0 (\d+) (\d+)\]/', $this->object($pdf, $page)[0], $m) ? "{$m[1]} {$m[2]}" : '',
+            [3, 6, 10],
+        ));
+        $this->assertStringContainsString('/Im0 7 0 R', $this->object($pdf, 6)[0], 'each page names its own image');
+        $this->assertStringContainsString('/SMask 9 0 R', $this->object($pdf, 7)[0], 'only the image with transparency has a mask');
+        $this->assertStringNotContainsString('/SMask', $this->object($pdf, 11)[0]);
+        $this->assertSame('q 2 0 0 7 0 0 cm /Im0 Do Q', $this->object($pdf, 12)[1]);
+    }
+
+    public function testEveryCrossReferencePointsAtItsObjectOnManyPages(): void
+    {
+        $pdf = ImageToPdf::fromStrings(array_fill(0, 4, $this->png(static fn () => null, 2, 2)));
+
+        preg_match('/startxref\n(\d+)\n%%EOF\n$/', $pdf, $start);
+        preg_match_all('/^(\d{10}) 00000 n $/m', substr($pdf, (int) $start[1]), $entries);
+
+        $this->assertCount(2 + 4 * 3, $entries[1]);
+        foreach ($entries[1] as $index => $offset) {
+            $this->assertStringStartsWith(($index + 1).' 0 obj', substr($pdf, (int) $offset));
+        }
+    }
+
+    public function testConvertAllWritesOnePdfOfEveryImage(): void
+    {
+        $directory = sys_get_temp_dir().'/pdf-converter-'.bin2hex(random_bytes(4));
+        mkdir($directory);
+        $images = [];
+        foreach ([[4, 3], [6, 2]] as $index => [$width, $height]) {
+            $images[] = $path = "{$directory}/{$index}.png";
+            file_put_contents($path, $this->png(static fn () => null, $width, $height));
+        }
+
+        try {
+            $this->assertSame("{$directory}/out.pdf", ImageToPdf::convertAll($images, "{$directory}/out.pdf"));
+            $this->assertSame(1, preg_match('/\/Count 2 >>/', (string) file_get_contents("{$directory}/out.pdf")));
+        } finally {
+            array_map('unlink', glob("{$directory}/*"));
+            rmdir($directory);
+        }
+    }
+
+    public function testNoImagesIsRefused(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('There are no images to convert.');
+
+        ImageToPdf::fromStrings([]);
+    }
+
+    public function testTheImageThatIsNotAnImageIsNamed(): void
+    {
+        $png = $this->png(static fn () => null, 2, 2);
+
+        try {
+            ImageToPdf::fromStrings([$png, 'not an image']);
+            $this->fail('the second image should be refused');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertStringStartsWith('Image 2 is not an image', $e->getMessage());
+        }
+
+        $this->expectExceptionMessage('notes.txt is not an image');
+        ImageToPdf::fromStrings([$png, 'not an image'], ['photo.png', 'notes.txt']);
+    }
+
+    public function testTheCommandLineTakesSeveralImagesAndAnOutput(): void
+    {
+        $directory = sys_get_temp_dir().'/pdf-converter-'.bin2hex(random_bytes(4));
+        mkdir($directory);
+        file_put_contents("{$directory}/a.png", $this->png(static fn () => null, 2, 2));
+        file_put_contents("{$directory}/b.png", $this->png(static fn () => null, 3, 3));
+        $script = escapeshellarg(PHP_BINARY).' '.escapeshellarg(dirname(__DIR__).'/bin/image-to-pdf');
+
+        try {
+            exec("{$script} ".escapeshellarg("{$directory}/a.png").' '.escapeshellarg("{$directory}/b.png").' '.escapeshellarg("{$directory}/both.pdf").' 2>&1', $out, $code);
+            $this->assertSame(0, $code, implode("\n", $out));
+            $this->assertSame(["{$directory}/both.pdf"], $out);
+            $this->assertStringContainsString('/Count 2 >>', (string) file_get_contents("{$directory}/both.pdf"));
+
+            exec("{$script} ".escapeshellarg("{$directory}/a.png").' 2>&1', $single, $code);
+            $this->assertSame(["{$directory}/a.pdf"], $single, 'one image still goes beside itself');
+
+            exec("{$script} 2>&1", $usage, $code);
+            $this->assertSame(1, $code);
+        } finally {
+            array_map('unlink', glob("{$directory}/*"));
+            rmdir($directory);
+        }
+    }
+
     public function testAMissingFileIsReported(): void
     {
         $this->expectException(\RuntimeException::class);

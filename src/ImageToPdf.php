@@ -5,18 +5,21 @@ declare(strict_types=1);
 namespace PdfConverter;
 
 /**
- * Converts an image into a single-page PDF whose page is exactly the size of the image.
+ * Converts images into a PDF with a page for each, every page exactly the size of its image.
  *
  * One pixel becomes one point, as in the ReportLab script this was ported from. Any format GD can read
  * works (PNG, JPEG, GIF, WebP, BMP and AVIF). Transparency is kept as a soft mask, so transparent areas
  * show the white page; GD stores alpha in 7 bits, so it is kept to within one step of 255.
+ *
+ * Images are decoded one at a time, and only their compressed pixels are kept, so many large images can
+ * go into one PDF.
  *
  * Needs only the gd and zlib extensions, which PHP ships with.
  */
 final class ImageToPdf
 {
     /**
-     * Converts an image file and writes the PDF.
+     * Converts an image file and writes a one-page PDF.
      *
      * @param string $imagePath The image to convert.
      * @param string $pdfPath   Where to write the PDF; an existing file is replaced.
@@ -28,7 +31,23 @@ final class ImageToPdf
      */
     public static function convert(string $imagePath, string $pdfPath): string
     {
-        $pdf = self::fromFile($imagePath);
+        return self::convertAll([$imagePath], $pdfPath);
+    }
+
+    /**
+     * Converts image files and writes a PDF with a page for each, in the order given.
+     *
+     * @param list<string> $imagePaths The images to convert, one per page.
+     * @param string       $pdfPath    Where to write the PDF; an existing file is replaced.
+     *
+     * @throws \RuntimeException         An image could not be read, or the PDF could not be written.
+     * @throws \InvalidArgumentException A file is not an image GD can read, or there are no images.
+     *
+     * @return string The PDF's path.
+     */
+    public static function convertAll(array $imagePaths, string $pdfPath): string
+    {
+        $pdf = self::fromFiles($imagePaths);
 
         if (false === @file_put_contents($pdfPath, $pdf)) {
             throw new \RuntimeException("Could not write {$pdfPath}.");
@@ -38,7 +57,7 @@ final class ImageToPdf
     }
 
     /**
-     * Converts an image file into the bytes of a PDF.
+     * Converts an image file into the bytes of a one-page PDF.
      *
      * @param string $imagePath The image to convert.
      *
@@ -47,17 +66,36 @@ final class ImageToPdf
      */
     public static function fromFile(string $imagePath): string
     {
-        $bytes = is_file($imagePath) ? @file_get_contents($imagePath) : false;
-
-        if (false === $bytes) {
-            throw new \RuntimeException("Could not read {$imagePath}.");
-        }
-
-        return self::fromString($bytes, $imagePath);
+        return self::fromFiles([$imagePath]);
     }
 
     /**
-     * Converts image bytes into the bytes of a PDF.
+     * Converts image files into the bytes of a PDF with a page for each, in the order given.
+     *
+     * Each file is read only when its page is made.
+     *
+     * @param list<string> $imagePaths The images to convert, one per page.
+     *
+     * @throws \RuntimeException         An image could not be read.
+     * @throws \InvalidArgumentException A file is not an image GD can read, or there are no images.
+     */
+    public static function fromFiles(array $imagePaths): string
+    {
+        return self::fromImages((static function () use ($imagePaths): \Generator {
+            foreach ($imagePaths as $imagePath) {
+                $bytes = is_file($imagePath) ? @file_get_contents($imagePath) : false;
+
+                if (false === $bytes) {
+                    throw new \RuntimeException("Could not read {$imagePath}.");
+                }
+
+                yield [$bytes, $imagePath];
+            }
+        })());
+    }
+
+    /**
+     * Converts image bytes into the bytes of a one-page PDF.
      *
      * @param string $bytes The image file's contents.
      * @param string $name  What to call the image in an error message.
@@ -66,15 +104,53 @@ final class ImageToPdf
      */
     public static function fromString(string $bytes, string $name = 'The image'): string
     {
-        $image = '' === $bytes ? false : @imagecreatefromstring($bytes);
+        return self::fromStrings([$bytes], [$name]);
+    }
 
-        if (false === $image) {
-            throw new \InvalidArgumentException("{$name} is not an image GD can read (PNG, JPEG, GIF, WebP, BMP or AVIF).");
+    /**
+     * Converts images' bytes into the bytes of a PDF with a page for each, in the order given.
+     *
+     * @param list<string> $images Each image file's contents, one per page.
+     * @param list<string> $names  What to call each image in an error message; by default "Image 1", "Image 2" and so on.
+     *
+     * @throws \InvalidArgumentException An image is not one GD can read, or there are no images.
+     */
+    public static function fromStrings(array $images, array $names = []): string
+    {
+        return self::fromImages((static function () use ($images, $names): \Generator {
+            foreach (array_values($images) as $index => $bytes) {
+                yield [$bytes, $names[$index] ?? 'Image '.($index + 1)];
+            }
+        })());
+    }
+
+    /**
+     * Decodes and compresses each image in turn, then builds the PDF.
+     *
+     * @param iterable<array{0: string, 1: string}> $images Each image's bytes and what to call it in an error message.
+     *
+     * @throws \InvalidArgumentException An image is not one GD can read, or there are no images.
+     */
+    private static function fromImages(iterable $images): string
+    {
+        $pages = [];
+
+        foreach ($images as [$bytes, $name]) {
+            $image = '' === $bytes ? false : @imagecreatefromstring($bytes);
+
+            if (false === $image) {
+                throw new \InvalidArgumentException("{$name} is not an image GD can read (PNG, JPEG, GIF, WebP, BMP or AVIF).");
+            }
+
+            [$rgb, $alpha] = self::samples($image);
+            $pages[] = [imagesx($image), imagesy($image), $rgb, $alpha];
         }
 
-        [$rgb, $alpha] = self::samples($image);
+        if ([] === $pages) {
+            throw new \InvalidArgumentException('There are no images to convert.');
+        }
 
-        return self::document(imagesx($image), imagesy($image), $rgb, $alpha);
+        return self::document($pages);
     }
 
     /**
@@ -124,27 +200,40 @@ final class ImageToPdf
     }
 
     /**
-     * Builds a one-page PDF that draws the image across the whole page.
+     * Builds a PDF with a page for each image, each image drawn across its whole page.
      *
-     * @param int     $width  The image's width in pixels, and the page's in points.
-     * @param int     $height The image's height in pixels, and the page's in points.
-     * @param string  $rgb    8-bit RGB samples, top row first, compressed with zlib.
-     * @param ?string $alpha  8-bit alpha samples, compressed with zlib, or null for an opaque image.
+     * Each page takes the next object numbers in turn: the page, its image, its content and, when the image
+     * has transparency, its mask. One image therefore gives objects 3 to 5 or 6, as it always has.
+     *
+     * @param list<array{0: int, 1: int, 2: string, 3: ?string}> $pages Each image's width and height in pixels, which are its page's in
+     *                                                                   points, and its RGB and alpha samples compressed with zlib, top
+     *                                                                   row first; alpha is null for an opaque image.
      */
-    private static function document(int $width, int $height, string $rgb, ?string $alpha): string
+    private static function document(array $pages): string
     {
-        $objects = [
-            1 => '<< /Type /Catalog /Pages 2 0 R >>',
-            2 => '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
-            3 => "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 {$width} {$height}] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>",
-            4 => self::image($width, $height, 'DeviceRGB', $rgb, null === $alpha ? '' : ' /SMask 6 0 R'),
-            // Scale the unit-square image to the page.
-            5 => self::stream('<<', "q {$width} 0 0 {$height} 0 0 cm /Im0 Do Q"),
-        ];
+        $objects = [1 => '<< /Type /Catalog /Pages 2 0 R >>'];
+        $kids = [];
+        $next = 3;
 
-        if (null !== $alpha) {
-            $objects[6] = self::image($width, $height, 'DeviceGray', $alpha, '');
+        foreach ($pages as [$width, $height, $rgb, $alpha]) {
+            $page = $next++;
+            $image = $next++;
+            $content = $next++;
+            $mask = null === $alpha ? null : $next++;
+            $kids[] = "{$page} 0 R";
+
+            $objects[$page] = "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 {$width} {$height}] /Resources << /XObject << /Im0 {$image} 0 R >> >> /Contents {$content} 0 R >>";
+            $objects[$image] = self::image($width, $height, 'DeviceRGB', $rgb, null === $mask ? '' : " /SMask {$mask} 0 R");
+            // Scale the unit-square image to the page.
+            $objects[$content] = self::stream('<<', "q {$width} 0 0 {$height} 0 0 cm /Im0 Do Q");
+
+            if (null !== $mask) {
+                $objects[$mask] = self::image($width, $height, 'DeviceGray', $alpha, '');
+            }
         }
+
+        $objects[2] = '<< /Type /Pages /Kids ['.implode(' ', $kids).'] /Count '.count($kids).' >>';
+        ksort($objects);
 
         // The comment of high bytes marks the file as binary for tools that guess.
         $pdf = "%PDF-1.4\n%\xE2\xE3\xCF\xD3\n";

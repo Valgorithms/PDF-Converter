@@ -1,6 +1,6 @@
 {
     "name": "vzgcoders/pdf-converter",
-    "description": "Converts an image into a single-page PDF the size of the image, with no dependencies beyond GD and zlib.",
+    "description": "Converts images into a PDF with a page for each, in the order given, every page the size of its image, with no dependencies beyond GD and zlib.",
     "type": "library",
     "license": "MIT",
     "require": {
