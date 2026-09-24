@@ -3,23 +3,43 @@ Search.appendIndex(
                 {
             "fqsen": "\\PdfConverter\\ImageToPdf",
             "name": "ImageToPdf",
-            "summary": "Converts\u0020an\u0020image\u0020into\u0020a\u0020single\u002Dpage\u0020PDF\u0020whose\u0020page\u0020is\u0020exactly\u0020the\u0020size\u0020of\u0020the\u0020image.",
+            "summary": "Converts\u0020images\u0020into\u0020a\u0020PDF\u0020with\u0020a\u0020page\u0020for\u0020each,\u0020every\u0020page\u0020exactly\u0020the\u0020size\u0020of\u0020its\u0020image.",
             "url": "classes/PdfConverter-ImageToPdf.html"
         },                {
             "fqsen": "\\PdfConverter\\ImageToPdf\u003A\u003Aconvert\u0028\u0029",
             "name": "convert",
-            "summary": "Converts\u0020an\u0020image\u0020file\u0020and\u0020writes\u0020the\u0020PDF.",
+            "summary": "Converts\u0020an\u0020image\u0020file\u0020and\u0020writes\u0020a\u0020one\u002Dpage\u0020PDF.",
             "url": "classes/PdfConverter-ImageToPdf.html#method_convert"
+        },                {
+            "fqsen": "\\PdfConverter\\ImageToPdf\u003A\u003AconvertAll\u0028\u0029",
+            "name": "convertAll",
+            "summary": "Converts\u0020image\u0020files\u0020and\u0020writes\u0020a\u0020PDF\u0020with\u0020a\u0020page\u0020for\u0020each,\u0020in\u0020the\u0020order\u0020given.",
+            "url": "classes/PdfConverter-ImageToPdf.html#method_convertAll"
         },                {
             "fqsen": "\\PdfConverter\\ImageToPdf\u003A\u003AfromFile\u0028\u0029",
             "name": "fromFile",
-            "summary": "Converts\u0020an\u0020image\u0020file\u0020into\u0020the\u0020bytes\u0020of\u0020a\u0020PDF.",
+            "summary": "Converts\u0020an\u0020image\u0020file\u0020into\u0020the\u0020bytes\u0020of\u0020a\u0020one\u002Dpage\u0020PDF.",
             "url": "classes/PdfConverter-ImageToPdf.html#method_fromFile"
+        },                {
+            "fqsen": "\\PdfConverter\\ImageToPdf\u003A\u003AfromFiles\u0028\u0029",
+            "name": "fromFiles",
+            "summary": "Converts\u0020image\u0020files\u0020into\u0020the\u0020bytes\u0020of\u0020a\u0020PDF\u0020with\u0020a\u0020page\u0020for\u0020each,\u0020in\u0020the\u0020order\u0020given.",
+            "url": "classes/PdfConverter-ImageToPdf.html#method_fromFiles"
         },                {
             "fqsen": "\\PdfConverter\\ImageToPdf\u003A\u003AfromString\u0028\u0029",
             "name": "fromString",
-            "summary": "Converts\u0020image\u0020bytes\u0020into\u0020the\u0020bytes\u0020of\u0020a\u0020PDF.",
+            "summary": "Converts\u0020image\u0020bytes\u0020into\u0020the\u0020bytes\u0020of\u0020a\u0020one\u002Dpage\u0020PDF.",
             "url": "classes/PdfConverter-ImageToPdf.html#method_fromString"
+        },                {
+            "fqsen": "\\PdfConverter\\ImageToPdf\u003A\u003AfromStrings\u0028\u0029",
+            "name": "fromStrings",
+            "summary": "Converts\u0020images\u0027\u0020bytes\u0020into\u0020the\u0020bytes\u0020of\u0020a\u0020PDF\u0020with\u0020a\u0020page\u0020for\u0020each,\u0020in\u0020the\u0020order\u0020given.",
+            "url": "classes/PdfConverter-ImageToPdf.html#method_fromStrings"
+        },                {
+            "fqsen": "\\PdfConverter\\ImageToPdf\u003A\u003AfromImages\u0028\u0029",
+            "name": "fromImages",
+            "summary": "Decodes\u0020and\u0020compresses\u0020each\u0020image\u0020in\u0020turn,\u0020then\u0020builds\u0020the\u0020PDF.",
+            "url": "classes/PdfConverter-ImageToPdf.html#method_fromImages"
         },                {
             "fqsen": "\\PdfConverter\\ImageToPdf\u003A\u003Asamples\u0028\u0029",
             "name": "samples",
@@ -28,7 +48,7 @@ Search.appendIndex(
         },                {
             "fqsen": "\\PdfConverter\\ImageToPdf\u003A\u003Adocument\u0028\u0029",
             "name": "document",
-            "summary": "Builds\u0020a\u0020one\u002Dpage\u0020PDF\u0020that\u0020draws\u0020the\u0020image\u0020across\u0020the\u0020whole\u0020page.",
+            "summary": "Builds\u0020a\u0020PDF\u0020with\u0020a\u0020page\u0020for\u0020each\u0020image,\u0020each\u0020image\u0020drawn\u0020across\u0020its\u0020whole\u0020page.",
             "url": "classes/PdfConverter-ImageToPdf.html#method_document"
         },                {
             "fqsen": "\\PdfConverter\\ImageToPdf\u003A\u003Aimage\u0028\u0029",

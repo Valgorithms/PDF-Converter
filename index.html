@@ -4,110 +4,36 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Image to PDF</title>
-  <meta name="description" content="Turn an image into a one-page PDF the size of the image. Runs in your browser; the image is never uploaded.">
-  <style>
-    :root {
-      color-scheme: light dark;
-      --bg: #f4f5f7;
-      --card: #ffffff;
-      --text: #1d2330;
-      --muted: #5b6475;
-      --line: #d5d9e0;
-      --accent: #2f6fde;
-      --accent-text: #ffffff;
-      --drop: #eef3fd;
-      --error: #b3261e;
-    }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #14171c;
-        --card: #1d2128;
-        --text: #e6e9ef;
-        --muted: #9aa3b2;
-        --line: #353b45;
-        --accent: #6b9cf0;
-        --accent-text: #0d1320;
-        --drop: #1f2a3d;
-        --error: #f2b8b5;
-      }
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background: var(--bg);
-      color: var(--text);
-      font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-      display: grid;
-      place-items: start center;
-      padding: 48px 16px;
-    }
-    main {
-      width: 100%;
-      max-width: 560px;
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 28px;
-    }
-    h1 { font-size: 1.5rem; margin: 0 0 4px; }
-    .lede { color: var(--muted); margin: 0 0 20px; }
-    .drop {
-      display: block;
-      border: 2px dashed var(--line);
-      border-radius: 10px;
-      padding: 32px 16px;
-      text-align: center;
-      cursor: pointer;
-      transition: border-color .15s, background .15s;
-    }
-    .drop:hover, .drop.over, .drop:focus-within { border-color: var(--accent); background: var(--drop); }
-    .drop strong { color: var(--accent); }
-    .drop input { position: absolute; width: 1px; height: 1px; opacity: 0; }
-    .hint { display: block; color: var(--muted); font-size: .875rem; margin-top: 6px; }
-    #status { min-height: 1.5em; margin: 16px 0 0; color: var(--muted); }
-    #status.error { color: var(--error); }
-    .result { margin-top: 16px; display: grid; gap: 12px; }
-    .result[hidden] { display: none; }
-    .result img {
-      max-width: 100%;
-      max-height: 320px;
-      justify-self: center;
-      border: 1px solid var(--line);
-      background: #fff;
-    }
-    .details { color: var(--muted); font-size: .875rem; margin: 0; text-align: center; }
-    .actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-    .button {
-      display: inline-block;
-      padding: 10px 18px;
-      border-radius: 8px;
-      font-weight: 600;
-      text-decoration: none;
-      border: 1px solid var(--accent);
-    }
-    .primary { background: var(--accent); color: var(--accent-text); }
-    .secondary { color: var(--accent); }
-    .button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
-    footer { color: var(--muted); font-size: .8125rem; margin-top: 24px; }
-    footer a { color: inherit; }
-  </style>
+  <meta name="description" content="Turn images into a PDF, one page per image, each page the size of its image. Runs in your browser; the images are never uploaded.">
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="app.js"></script>
 </head>
 <body>
   <main>
     <h1>Image to PDF</h1>
-    <p class="lede">Turns an image into a one-page PDF exactly the size of the image. It runs in your browser: the image is never uploaded.</p>
+    <p class="lede">Turns images into a PDF, one page per image, each page exactly the size of its image. It runs in your browser: the images are never uploaded.</p>
 
     <label class="drop" id="drop">
-      <input type="file" id="file" accept="image/*">
-      <strong>Choose an image</strong> or drop one here
-      <span class="hint">PNG, JPEG, GIF, WebP, AVIF or BMP</span>
+      <input type="file" id="file" accept="image/*" multiple>
+      <strong id="drop-label">Choose images</strong> or drop them here
+      <span class="hint">PNG, JPEG, GIF, WebP, AVIF or BMP. Each image becomes a page.</span>
     </label>
+
+    <section class="pages" id="pages-section" aria-labelledby="pages-heading" hidden>
+      <div class="pages-head">
+        <h2 id="pages-heading">Pages <span id="count" class="count"></span></h2>
+        <button type="button" class="link" id="clear">Remove all</button>
+      </div>
+      <p class="hint" id="order-hint">Drag a page to move it, or use its arrows.</p>
+      <ol id="pages" class="list"></ol>
+      <div class="actions">
+        <button type="button" class="button primary" id="make">Make PDF</button>
+      </div>
+    </section>
 
     <p id="status" role="status" aria-live="polite"></p>
 
     <section class="result" id="result" hidden>
-      <img id="preview" alt="The image being converted">
       <p class="details" id="details"></p>
       <div class="actions">
         <a class="button primary" id="download">Download PDF</a>
@@ -121,72 +47,5 @@
       with its <a href="reference/">class reference</a>.
     </footer>
   </main>
-
-  <script type="module">
-    import { imageToPdf } from './image-to-pdf.js';
-
-    const input = document.getElementById('file');
-    const drop = document.getElementById('drop');
-    const status = document.getElementById('status');
-    const result = document.getElementById('result');
-    const preview = document.getElementById('preview');
-    const details = document.getElementById('details');
-    const download = document.getElementById('download');
-    const open = document.getElementById('open');
-    let urls = [];
-
-    function say(message, isError = false) {
-      status.textContent = message;
-      status.classList.toggle('error', isError);
-    }
-
-    function kilobytes(bytes) {
-      return bytes < 1048576 ? `${Math.ceil(bytes / 1024)} KB` : `${(bytes / 1048576).toFixed(1)} MB`;
-    }
-
-    async function convert(file) {
-      if (!file) {
-        return;
-      }
-
-      urls.forEach((url) => URL.revokeObjectURL(url));
-      urls = [];
-      result.hidden = true;
-      say(`Converting ${file.name}…`);
-
-      try {
-        const { pdf, width, height } = await imageToPdf(file);
-        const pdfUrl = URL.createObjectURL(new Blob([pdf], { type: 'application/pdf' }));
-        const imageUrl = URL.createObjectURL(file);
-        urls = [pdfUrl, imageUrl];
-
-        preview.src = imageUrl;
-        details.textContent = `${width} × ${height} pixels → a ${width} × ${height} point page · ${kilobytes(pdf.length)}`;
-        download.href = pdfUrl;
-        download.download = `${file.name.replace(/\.[^.]*$/, '') || 'image'}.pdf`;
-        open.href = pdfUrl;
-        result.hidden = false;
-        say(`${file.name} is ready.`);
-      } catch (error) {
-        say(error.message, true);
-      }
-    }
-
-    input.addEventListener('change', () => convert(input.files[0]));
-
-    for (const type of ['dragenter', 'dragover']) {
-      drop.addEventListener(type, (event) => {
-        event.preventDefault();
-        drop.classList.add('over');
-      });
-    }
-    for (const type of ['dragleave', 'drop']) {
-      drop.addEventListener(type, () => drop.classList.remove('over'));
-    }
-    drop.addEventListener('drop', (event) => {
-      event.preventDefault();
-      convert(event.dataTransfer.files[0]);
-    });
-  </script>
 </body>
 </html>

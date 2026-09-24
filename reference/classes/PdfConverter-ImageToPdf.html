@@ -116,16 +116,18 @@
         <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/ImageToPdf.php"><a href="files/src-imagetopdf.html"><abbr title="src/ImageToPdf.php">ImageToPdf.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">16</span>
+    <span class="phpdocumentor-element-found-in__line">19</span>
 
     </aside>
 
-            <p class="phpdocumentor-summary">Converts an image into a single-page PDF whose page is exactly the size of the image.</p>
+            <p class="phpdocumentor-summary">Converts images into a PDF with a page for each, every page exactly the size of its image.</p>
 
 
     <section class="phpdocumentor-description"><p>One pixel becomes one point, as in the ReportLab script this was ported from. Any format GD can read
 works (PNG, JPEG, GIF, WebP, BMP and AVIF). Transparency is kept as a soft mask, so transparent areas
 show the white page; GD stores alpha in 7 bits, so it is kept to within one step of 255.</p>
+<p>Images are decoded one at a time, and only their compressed pixels are kept, so many large images can
+go into one PDF.</p>
 <p>Needs only the gd and zlib extensions, which PHP ships with.</p>
 </section>
 
@@ -159,28 +161,56 @@ show the white page; GD stores alpha in 7 bits, so it is kept to within one step
     <span>
                                 &nbsp;: string    </span>
 </dt>
-<dd>Converts an image file and writes the PDF.</dd>
+<dd>Converts an image file and writes a one-page PDF.</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a class="" href="classes/PdfConverter-ImageToPdf.html#method_convertAll">convertAll()</a>
+    <span>
+                                &nbsp;: string    </span>
+</dt>
+<dd>Converts image files and writes a PDF with a page for each, in the order given.</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a class="" href="classes/PdfConverter-ImageToPdf.html#method_fromFile">fromFile()</a>
     <span>
                                 &nbsp;: string    </span>
 </dt>
-<dd>Converts an image file into the bytes of a PDF.</dd>
+<dd>Converts an image file into the bytes of a one-page PDF.</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a class="" href="classes/PdfConverter-ImageToPdf.html#method_fromFiles">fromFiles()</a>
+    <span>
+                                &nbsp;: string    </span>
+</dt>
+<dd>Converts image files into the bytes of a PDF with a page for each, in the order given.</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a class="" href="classes/PdfConverter-ImageToPdf.html#method_fromString">fromString()</a>
     <span>
                                 &nbsp;: string    </span>
 </dt>
-<dd>Converts image bytes into the bytes of a PDF.</dd>
+<dd>Converts image bytes into the bytes of a one-page PDF.</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a class="" href="classes/PdfConverter-ImageToPdf.html#method_fromStrings">fromStrings()</a>
+    <span>
+                                &nbsp;: string    </span>
+</dt>
+<dd>Converts images&#039; bytes into the bytes of a PDF with a page for each, in the order given.</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -private">
     <a class="" href="classes/PdfConverter-ImageToPdf.html#method_document">document()</a>
     <span>
                                 &nbsp;: string    </span>
 </dt>
-<dd>Builds a one-page PDF that draws the image across the whole page.</dd>
+<dd>Builds a PDF with a page for each image, each image drawn across its whole page.</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -private">
+    <a class="" href="classes/PdfConverter-ImageToPdf.html#method_fromImages">fromImages()</a>
+    <span>
+                                &nbsp;: string    </span>
+</dt>
+<dd>Decodes and compresses each image in turn, then builds the PDF.</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -private">
     <a class="" href="classes/PdfConverter-ImageToPdf.html#method_image">image()</a>
@@ -231,11 +261,11 @@ show the white page; GD stores alpha in 7 bits, so it is kept to within one step
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/ImageToPdf.php"><a href="files/src-imagetopdf.html"><abbr title="src/ImageToPdf.php">ImageToPdf.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">29</span>
+    <span class="phpdocumentor-element-found-in__line">32</span>
 
     </aside>
 
-        <p class="phpdocumentor-summary">Converts an image file and writes the PDF.</p>
+        <p class="phpdocumentor-summary">Converts an image file and writes a one-page PDF.</p>
 
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">public</span>
@@ -309,9 +339,9 @@ show the white page; GD stores alpha in 7 bits, so it is kept to within one step
             -public
                                     -static                    "
 >
-    <h4 class="phpdocumentor-element__name" id="method_fromFile">
-        fromFile()
-        <a href="classes/PdfConverter-ImageToPdf.html#method_fromFile" class="headerlink"><i class="fas fa-link"></i></a>
+    <h4 class="phpdocumentor-element__name" id="method_convertAll">
+        convertAll()
+        <a href="classes/PdfConverter-ImageToPdf.html#method_convertAll" class="headerlink"><i class="fas fa-link"></i></a>
 
     </h4>
     <aside class="phpdocumentor-element-found-in">
@@ -321,7 +351,93 @@ show the white page; GD stores alpha in 7 bits, so it is kept to within one step
 
     </aside>
 
-        <p class="phpdocumentor-summary">Converts an image file into the bytes of a PDF.</p>
+        <p class="phpdocumentor-summary">Converts image files and writes a PDF with a page for each, in the order given.</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+            <span class="phpdocumentor-signature__static">static</span>        <span class="phpdocumentor-signature__name">convertAll</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__type">array&lt;int, string&gt;&nbsp;</span><span class="phpdocumentor-signature__argument__name">$imagePaths</span></span><span class="phpdocumentor-signature__argument"><span>, </span><span class="phpdocumentor-signature__argument__type">string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$pdfPath</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">string</span></code>
+
+    <div class="phpdocumentor-label-line">
+        </div>
+    
+    
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-argument-list__argument__name">$imagePaths</span>
+                : <span class="phpdocumentor-argument-list__argument__type">array&lt;int, string&gt;</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"><p>The images to convert, one per page.</p>
+</section>
+
+            </dd>
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-argument-list__argument__name">$pdfPath</span>
+                : <span class="phpdocumentor-argument-list__argument__type">string</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"><p>Where to write the PDF; an existing file is replaced.</p>
+</section>
+
+            </dd>
+            </dl>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="method_convertAll_tags">
+        Tags
+        <a href="classes/PdfConverter-ImageToPdf.html#method_convertAll_tags" class="headerlink"><i class="fas fa-link"></i></a>
+
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                    <dt class="phpdocumentor-tag-list__entry">
+                <span class="phpdocumentor-tag__name">throws</span>
+            </dt>
+                            <dd class="phpdocumentor-tag-list__definition">
+                                                                <span class="phpdocumentor-tag-link"><abbr title="\RuntimeException">RuntimeException</abbr></span>
+                                                                                        <section class="phpdocumentor-description"><p>An image could not be read, or the PDF could not be written.</p>
+</section>
+
+                                    </dd>
+                            <dd class="phpdocumentor-tag-list__definition">
+                                                                <span class="phpdocumentor-tag-link"><abbr title="\InvalidArgumentException">InvalidArgumentException</abbr></span>
+                                                                                        <section class="phpdocumentor-description"><p>A file is not an image GD can read, or there are no images.</p>
+</section>
+
+                                    </dd>
+                        </dl>
+
+        
+    
+            <section>
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+        <span class="phpdocumentor-signature__response_type">string</span>
+                    &mdash;
+                <section class="phpdocumentor-description"><p>The PDF's path.</p>
+</section>
+
+            </section>
+
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                    -static                    "
+>
+    <h4 class="phpdocumentor-element__name" id="method_fromFile">
+        fromFile()
+        <a href="classes/PdfConverter-ImageToPdf.html#method_fromFile" class="headerlink"><i class="fas fa-link"></i></a>
+
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/ImageToPdf.php"><a href="files/src-imagetopdf.html"><abbr title="src/ImageToPdf.php">ImageToPdf.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">67</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Converts an image file into the bytes of a one-page PDF.</p>
 
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">public</span>
@@ -382,6 +498,81 @@ show the white page; GD stores alpha in 7 bits, so it is kept to within one step
             -public
                                     -static                    "
 >
+    <h4 class="phpdocumentor-element__name" id="method_fromFiles">
+        fromFiles()
+        <a href="classes/PdfConverter-ImageToPdf.html#method_fromFiles" class="headerlink"><i class="fas fa-link"></i></a>
+
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/ImageToPdf.php"><a href="files/src-imagetopdf.html"><abbr title="src/ImageToPdf.php">ImageToPdf.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">82</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Converts image files into the bytes of a PDF with a page for each, in the order given.</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+            <span class="phpdocumentor-signature__static">static</span>        <span class="phpdocumentor-signature__name">fromFiles</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__type">array&lt;int, string&gt;&nbsp;</span><span class="phpdocumentor-signature__argument__name">$imagePaths</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">string</span></code>
+
+    <div class="phpdocumentor-label-line">
+        </div>
+    
+        <section class="phpdocumentor-description"><p>Each file is read only when its page is made.</p>
+</section>
+
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-argument-list__argument__name">$imagePaths</span>
+                : <span class="phpdocumentor-argument-list__argument__type">array&lt;int, string&gt;</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"><p>The images to convert, one per page.</p>
+</section>
+
+            </dd>
+            </dl>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="method_fromFiles_tags">
+        Tags
+        <a href="classes/PdfConverter-ImageToPdf.html#method_fromFiles_tags" class="headerlink"><i class="fas fa-link"></i></a>
+
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                    <dt class="phpdocumentor-tag-list__entry">
+                <span class="phpdocumentor-tag__name">throws</span>
+            </dt>
+                            <dd class="phpdocumentor-tag-list__definition">
+                                                                <span class="phpdocumentor-tag-link"><abbr title="\RuntimeException">RuntimeException</abbr></span>
+                                                                                        <section class="phpdocumentor-description"><p>An image could not be read.</p>
+</section>
+
+                                    </dd>
+                            <dd class="phpdocumentor-tag-list__definition">
+                                                                <span class="phpdocumentor-tag-link"><abbr title="\InvalidArgumentException">InvalidArgumentException</abbr></span>
+                                                                                        <section class="phpdocumentor-description"><p>A file is not an image GD can read, or there are no images.</p>
+</section>
+
+                                    </dd>
+                        </dl>
+
+        
+    
+            <section>
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+        <span class="phpdocumentor-signature__response_type">string</span>
+            </section>
+
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                    -static                    "
+>
     <h4 class="phpdocumentor-element__name" id="method_fromString">
         fromString()
         <a href="classes/PdfConverter-ImageToPdf.html#method_fromString" class="headerlink"><i class="fas fa-link"></i></a>
@@ -390,11 +581,11 @@ show the white page; GD stores alpha in 7 bits, so it is kept to within one step
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/ImageToPdf.php"><a href="files/src-imagetopdf.html"><abbr title="src/ImageToPdf.php">ImageToPdf.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">67</span>
+    <span class="phpdocumentor-element-found-in__line">105</span>
 
     </aside>
 
-        <p class="phpdocumentor-summary">Converts image bytes into the bytes of a PDF.</p>
+        <p class="phpdocumentor-summary">Converts image bytes into the bytes of a one-page PDF.</p>
 
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">public</span>
@@ -455,6 +646,82 @@ show the white page; GD stores alpha in 7 bits, so it is kept to within one step
                     <article
         class="phpdocumentor-element
             -method
+            -public
+                                    -static                    "
+>
+    <h4 class="phpdocumentor-element__name" id="method_fromStrings">
+        fromStrings()
+        <a href="classes/PdfConverter-ImageToPdf.html#method_fromStrings" class="headerlink"><i class="fas fa-link"></i></a>
+
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/ImageToPdf.php"><a href="files/src-imagetopdf.html"><abbr title="src/ImageToPdf.php">ImageToPdf.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">118</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Converts images&#039; bytes into the bytes of a PDF with a page for each, in the order given.</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+            <span class="phpdocumentor-signature__static">static</span>        <span class="phpdocumentor-signature__name">fromStrings</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__type">array&lt;int, string&gt;&nbsp;</span><span class="phpdocumentor-signature__argument__name">$images</span></span><span class="phpdocumentor-signature__argument"><span>[</span><span>, </span><span class="phpdocumentor-signature__argument__type">array&lt;int, string&gt;&nbsp;</span><span class="phpdocumentor-signature__argument__name">$names</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">[]</span><span> ]</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">string</span></code>
+
+    <div class="phpdocumentor-label-line">
+        </div>
+    
+    
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-argument-list__argument__name">$images</span>
+                : <span class="phpdocumentor-argument-list__argument__type">array&lt;int, string&gt;</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"><p>Each image file's contents, one per page.</p>
+</section>
+
+            </dd>
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-argument-list__argument__name">$names</span>
+                : <span class="phpdocumentor-argument-list__argument__type">array&lt;int, string&gt;</span>
+                 = <span class="phpdocumentor-argument-list__argument__default-value">[]</span>            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"><p>What to call each image in an error message; by default &quot;Image 1&quot;, &quot;Image 2&quot; and so on.</p>
+</section>
+
+            </dd>
+            </dl>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="method_fromStrings_tags">
+        Tags
+        <a href="classes/PdfConverter-ImageToPdf.html#method_fromStrings_tags" class="headerlink"><i class="fas fa-link"></i></a>
+
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                    <dt class="phpdocumentor-tag-list__entry">
+                <span class="phpdocumentor-tag__name">throws</span>
+            </dt>
+                            <dd class="phpdocumentor-tag-list__definition">
+                                                                <span class="phpdocumentor-tag-link"><abbr title="\InvalidArgumentException">InvalidArgumentException</abbr></span>
+                                                                                        <section class="phpdocumentor-description"><p>An image is not one GD can read, or there are no images.</p>
+</section>
+
+                                    </dd>
+                        </dl>
+
+        
+    
+            <section>
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+        <span class="phpdocumentor-signature__response_type">string</span>
+            </section>
+
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
             -private
                                     -static                    "
 >
@@ -466,15 +733,71 @@ show the white page; GD stores alpha in 7 bits, so it is kept to within one step
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/ImageToPdf.php"><a href="files/src-imagetopdf.html"><abbr title="src/ImageToPdf.php">ImageToPdf.php</abbr></a></abbr>
     :
+    <span class="phpdocumentor-element-found-in__line">212</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Builds a PDF with a page for each image, each image drawn across its whole page.</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">private</span>
+            <span class="phpdocumentor-signature__static">static</span>        <span class="phpdocumentor-signature__name">document</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__type">array&lt;int, array{0: int, 1: int, 2: string, 3: ?string}&gt;&nbsp;</span><span class="phpdocumentor-signature__argument__name">$pages</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">string</span></code>
+
+    <div class="phpdocumentor-label-line">
+        </div>
+    
+        <section class="phpdocumentor-description"><p>Each page takes the next object numbers in turn: the page, its image, its content and, when the image
+has transparency, its mask. One image therefore gives objects 3 to 5 or 6, as it always has.</p>
+</section>
+
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-argument-list__argument__name">$pages</span>
+                : <span class="phpdocumentor-argument-list__argument__type">array&lt;int, array{0: int, 1: int, 2: string, 3: ?string}&gt;</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"><p>Each image's width and height in pixels, which are its page's in
+points, and its RGB and alpha samples compressed with zlib, top
+row first; alpha is null for an opaque image.</p>
+</section>
+
+            </dd>
+            </dl>
+
+    
+
+        
+    
+            <section>
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+        <span class="phpdocumentor-signature__response_type">string</span>
+            </section>
+
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -private
+                                    -static                    "
+>
+    <h4 class="phpdocumentor-element__name" id="method_fromImages">
+        fromImages()
+        <a href="classes/PdfConverter-ImageToPdf.html#method_fromImages" class="headerlink"><i class="fas fa-link"></i></a>
+
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/ImageToPdf.php"><a href="files/src-imagetopdf.html"><abbr title="src/ImageToPdf.php">ImageToPdf.php</abbr></a></abbr>
+    :
     <span class="phpdocumentor-element-found-in__line">134</span>
 
     </aside>
 
-        <p class="phpdocumentor-summary">Builds a one-page PDF that draws the image across the whole page.</p>
+        <p class="phpdocumentor-summary">Decodes and compresses each image in turn, then builds the PDF.</p>
 
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">private</span>
-            <span class="phpdocumentor-signature__static">static</span>        <span class="phpdocumentor-signature__name">document</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__type">int&nbsp;</span><span class="phpdocumentor-signature__argument__name">$width</span></span><span class="phpdocumentor-signature__argument"><span>, </span><span class="phpdocumentor-signature__argument__type">int&nbsp;</span><span class="phpdocumentor-signature__argument__name">$height</span></span><span class="phpdocumentor-signature__argument"><span>, </span><span class="phpdocumentor-signature__argument__type">string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$rgb</span></span><span class="phpdocumentor-signature__argument"><span>, </span><span class="phpdocumentor-signature__argument__type">string|null&nbsp;</span><span class="phpdocumentor-signature__argument__name">$alpha</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">string</span></code>
+            <span class="phpdocumentor-signature__static">static</span>        <span class="phpdocumentor-signature__name">fromImages</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__type">iterable&lt;string|int, array{0: string, 1: string}&gt;&nbsp;</span><span class="phpdocumentor-signature__argument__name">$images</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">string</span></code>
 
     <div class="phpdocumentor-label-line">
         </div>
@@ -483,44 +806,33 @@ show the white page; GD stores alpha in 7 bits, so it is kept to within one step
         <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
     <dl class="phpdocumentor-argument-list">
                     <dt class="phpdocumentor-argument-list__entry">
-                <span class="phpdocumentor-argument-list__argument__name">$width</span>
-                : <span class="phpdocumentor-argument-list__argument__type">int</span>
+                <span class="phpdocumentor-argument-list__argument__name">$images</span>
+                : <span class="phpdocumentor-argument-list__argument__type">iterable&lt;string|int, array{0: string, 1: string}&gt;</span>
                             </dt>
             <dd class="phpdocumentor-argument-list__definition">
-                    <section class="phpdocumentor-description"><p>The image's width in pixels, and the page's in points.</p>
-</section>
-
-            </dd>
-                    <dt class="phpdocumentor-argument-list__entry">
-                <span class="phpdocumentor-argument-list__argument__name">$height</span>
-                : <span class="phpdocumentor-argument-list__argument__type">int</span>
-                            </dt>
-            <dd class="phpdocumentor-argument-list__definition">
-                    <section class="phpdocumentor-description"><p>The image's height in pixels, and the page's in points.</p>
-</section>
-
-            </dd>
-                    <dt class="phpdocumentor-argument-list__entry">
-                <span class="phpdocumentor-argument-list__argument__name">$rgb</span>
-                : <span class="phpdocumentor-argument-list__argument__type">string</span>
-                            </dt>
-            <dd class="phpdocumentor-argument-list__definition">
-                    <section class="phpdocumentor-description"><p>8-bit RGB samples, top row first, compressed with zlib.</p>
-</section>
-
-            </dd>
-                    <dt class="phpdocumentor-argument-list__entry">
-                <span class="phpdocumentor-argument-list__argument__name">$alpha</span>
-                : <span class="phpdocumentor-argument-list__argument__type">string|null</span>
-                            </dt>
-            <dd class="phpdocumentor-argument-list__definition">
-                    <section class="phpdocumentor-description"><p>8-bit alpha samples, compressed with zlib, or null for an opaque image.</p>
+                    <section class="phpdocumentor-description"><p>Each image's bytes and what to call it in an error message.</p>
 </section>
 
             </dd>
             </dl>
 
     
+    <h5 class="phpdocumentor-tag-list__heading" id="method_fromImages_tags">
+        Tags
+        <a href="classes/PdfConverter-ImageToPdf.html#method_fromImages_tags" class="headerlink"><i class="fas fa-link"></i></a>
+
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                    <dt class="phpdocumentor-tag-list__entry">
+                <span class="phpdocumentor-tag__name">throws</span>
+            </dt>
+                            <dd class="phpdocumentor-tag-list__definition">
+                                                                <span class="phpdocumentor-tag-link"><abbr title="\InvalidArgumentException">InvalidArgumentException</abbr></span>
+                                                                                        <section class="phpdocumentor-description"><p>An image is not one GD can read, or there are no images.</p>
+</section>
+
+                                    </dd>
+                        </dl>
 
         
     
@@ -544,7 +856,7 @@ show the white page; GD stores alpha in 7 bits, so it is kept to within one step
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/ImageToPdf.php"><a href="files/src-imagetopdf.html"><abbr title="src/ImageToPdf.php">ImageToPdf.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">176</span>
+    <span class="phpdocumentor-element-found-in__line">265</span>
 
     </aside>
 
@@ -627,7 +939,7 @@ show the white page; GD stores alpha in 7 bits, so it is kept to within one step
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/ImageToPdf.php"><a href="files/src-imagetopdf.html"><abbr title="src/ImageToPdf.php">ImageToPdf.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">87</span>
+    <span class="phpdocumentor-element-found-in__line">163</span>
 
     </aside>
 
@@ -682,7 +994,7 @@ show the white page; GD stores alpha in 7 bits, so it is kept to within one step
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/ImageToPdf.php"><a href="files/src-imagetopdf.html"><abbr title="src/ImageToPdf.php">ImageToPdf.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">189</span>
+    <span class="phpdocumentor-element-found-in__line">278</span>
 
     </aside>
 
@@ -749,9 +1061,13 @@ show the white page; GD stores alpha in 7 bits, so it is kept to within one step
             <li>
                 <ul class="phpdocumentor-list -clean">
                                             <li class=""><a href="classes/PdfConverter-ImageToPdf.html#method_convert">convert()</a></li>
+                                            <li class=""><a href="classes/PdfConverter-ImageToPdf.html#method_convertAll">convertAll()</a></li>
                                             <li class=""><a href="classes/PdfConverter-ImageToPdf.html#method_fromFile">fromFile()</a></li>
+                                            <li class=""><a href="classes/PdfConverter-ImageToPdf.html#method_fromFiles">fromFiles()</a></li>
                                             <li class=""><a href="classes/PdfConverter-ImageToPdf.html#method_fromString">fromString()</a></li>
+                                            <li class=""><a href="classes/PdfConverter-ImageToPdf.html#method_fromStrings">fromStrings()</a></li>
                                             <li class=""><a href="classes/PdfConverter-ImageToPdf.html#method_document">document()</a></li>
+                                            <li class=""><a href="classes/PdfConverter-ImageToPdf.html#method_fromImages">fromImages()</a></li>
                                             <li class=""><a href="classes/PdfConverter-ImageToPdf.html#method_image">image()</a></li>
                                             <li class=""><a href="classes/PdfConverter-ImageToPdf.html#method_samples">samples()</a></li>
                                             <li class=""><a href="classes/PdfConverter-ImageToPdf.html#method_stream">stream()</a></li>
