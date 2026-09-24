@@ -1,0 +1,54 @@
+Search.appendIndex(
+    [
+                {
+            "fqsen": "\\PdfConverter\\ImageToPdf",
+            "name": "ImageToPdf",
+            "summary": "Converts\u0020an\u0020image\u0020into\u0020a\u0020single\u002Dpage\u0020PDF\u0020whose\u0020page\u0020is\u0020exactly\u0020the\u0020size\u0020of\u0020the\u0020image.",
+            "url": "classes/PdfConverter-ImageToPdf.html"
+        },                {
+            "fqsen": "\\PdfConverter\\ImageToPdf\u003A\u003Aconvert\u0028\u0029",
+            "name": "convert",
+            "summary": "Converts\u0020an\u0020image\u0020file\u0020and\u0020writes\u0020the\u0020PDF.",
+            "url": "classes/PdfConverter-ImageToPdf.html#method_convert"
+        },                {
+            "fqsen": "\\PdfConverter\\ImageToPdf\u003A\u003AfromFile\u0028\u0029",
+            "name": "fromFile",
+            "summary": "Converts\u0020an\u0020image\u0020file\u0020into\u0020the\u0020bytes\u0020of\u0020a\u0020PDF.",
+            "url": "classes/PdfConverter-ImageToPdf.html#method_fromFile"
+        },                {
+            "fqsen": "\\PdfConverter\\ImageToPdf\u003A\u003AfromString\u0028\u0029",
+            "name": "fromString",
+            "summary": "Converts\u0020image\u0020bytes\u0020into\u0020the\u0020bytes\u0020of\u0020a\u0020PDF.",
+            "url": "classes/PdfConverter-ImageToPdf.html#method_fromString"
+        },                {
+            "fqsen": "\\PdfConverter\\ImageToPdf\u003A\u003Asamples\u0028\u0029",
+            "name": "samples",
+            "summary": "Reads\u0020an\u0020image\u0027s\u0020pixels,\u0020top\u0020row\u0020first,\u0020as\u00208\u002Dbit\u0020RGB\u0020samples\u0020and\u00208\u002Dbit\u0020alpha\u0020samples,\u0020compressed\u0020with\u0020zlib.",
+            "url": "classes/PdfConverter-ImageToPdf.html#method_samples"
+        },                {
+            "fqsen": "\\PdfConverter\\ImageToPdf\u003A\u003Adocument\u0028\u0029",
+            "name": "document",
+            "summary": "Builds\u0020a\u0020one\u002Dpage\u0020PDF\u0020that\u0020draws\u0020the\u0020image\u0020across\u0020the\u0020whole\u0020page.",
+            "url": "classes/PdfConverter-ImageToPdf.html#method_document"
+        },                {
+            "fqsen": "\\PdfConverter\\ImageToPdf\u003A\u003Aimage\u0028\u0029",
+            "name": "image",
+            "summary": "An\u0020image\u0020XObject\u0020holding\u00208\u002Dbit\u0020samples.",
+            "url": "classes/PdfConverter-ImageToPdf.html#method_image"
+        },                {
+            "fqsen": "\\PdfConverter\\ImageToPdf\u003A\u003Astream\u0028\u0029",
+            "name": "stream",
+            "summary": "A\u0020stream\u0020object\u003A\u0020its\u0020dictionary,\u0020which\u0020this\u0020closes\u0020after\u0020adding\u0020the\u0020length,\u0020and\u0020its\u0020data.",
+            "url": "classes/PdfConverter-ImageToPdf.html#method_stream"
+        },                {
+            "fqsen": "\\",
+            "name": "\\",
+            "summary": "",
+            "url": "namespaces/default.html"
+        },                {
+            "fqsen": "\\PdfConverter",
+            "name": "PdfConverter",
+            "summary": "",
+            "url": "namespaces/pdfconverter.html"
+        }            ]
+);
